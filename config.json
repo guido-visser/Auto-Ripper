@@ -1,0 +1,14 @@
+{
+	"dependencies": {
+		"makemkv": "",
+		"handbrake": "",
+		"subsync": ""
+	},
+	"drive": [],
+	"defaults": {
+		"outputDir": "",
+		"languages": ["eng"],
+		"includeSubs": true,
+		"audioCodec": ["DTS-HD MA", "DTS", "DD"]
+	}
+}
