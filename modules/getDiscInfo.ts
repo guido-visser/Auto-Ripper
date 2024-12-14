@@ -1,9 +1,13 @@
+import { Config } from "../types.ts";
 import { execCommand } from "./execCommand.ts";
 import { parseMakemkvOutput, ParseResult } from "./parser.ts";
 
-export async function getDiscInfo(driveIndex: number): Promise<ParseResult> {
+export async function getDiscInfo(
+	config: Config,
+	driveIndex: number
+): Promise<ParseResult> {
 	const output = await execCommand([
-		"makemkvcon64.exe",
+		config.dependencies.makemkv,
 		"-r",
 		"info",
 		`disc:${driveIndex}`,

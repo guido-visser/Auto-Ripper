@@ -1,10 +1,16 @@
 export type Config = {
-	makemkv: string;
+	dependencies: {
+		makemkv: string;
+		handbrake: string;
+		subsync: string;
+	};
 	drive: string[];
 	defaults: {
 		outputDir: string;
-		languages: string[];
+		audioLanguages: string[];
+		subLanguages: string[];
 		includeSubs: boolean;
 		audioCodec: string[];
+		audioName: string[];
 	};
 };

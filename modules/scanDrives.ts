@@ -4,7 +4,7 @@ import { parseMakeMKVOutput } from "./parsers/scanDrivesOutputParser.ts";
 
 export async function scanDrives(config: Config) {
 	const output = await execCommand([
-		config.makemkv,
+		config.dependencies.makemkv,
 		"-r",
 		"--cache=1",
 		"info",
@@ -12,5 +12,4 @@ export async function scanDrives(config: Config) {
 	]);
 	const info = parseMakeMKVOutput(output);
 	return info;
-	debugger;
 }

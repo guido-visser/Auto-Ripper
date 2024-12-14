@@ -17,7 +17,6 @@ export async function execCommand(
 
 	if (code !== 0) {
 		throw new Error(new TextDecoder().decode(stderr));
-		debugger;
 	}
 
 	return new TextDecoder().decode(stdout);

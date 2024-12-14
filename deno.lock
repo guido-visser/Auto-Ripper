@@ -268,6 +268,7 @@
   },
   "redirects": {
     "https://deno.land/std/cli/parse_args.ts": "https://deno.land/std@0.224.0/cli/parse_args.ts",
+    "https://deno.land/x/clear/mod.ts": "https://deno.land/x/clear@v1.3.0/mod.ts",
     "https://deno.land/x/inquirer/mod.ts": "https://deno.land/x/inquirer@v0.0.4/mod.ts"
   },
   "remote": {
@@ -311,6 +312,7 @@
     "https://deno.land/x/ansi@1.0.1/link.ts": "9dff91f666747f09f9c7a58f7d02781142483003bab6fe44612e2081f93dd2ac",
     "https://deno.land/x/ansi@1.0.1/mod.ts": "10a10101feb7da0e565214f725a3d8e79b3e4a2d8cb22cdeaba1a21a53889945",
     "https://deno.land/x/ansi@1.0.1/scroll.ts": "071a30cbd84b66de2eb24752ef97ceff475a2fc22aa2f6283baaa904208bda69",
+    "https://deno.land/x/clear@v1.3.0/mod.ts": "9abc2ed62e12fa2d9ef31bb8a7b6108f4dff1a52afab96dd4d9fc0272cb5f83d",
     "https://deno.land/x/cliffy@v0.25.7/_utils/distance.ts": "02af166952c7c358ac83beae397aa2fbca4ad630aecfcd38d92edb1ea429f004",
     "https://deno.land/x/cliffy@v0.25.7/ansi/ansi_escapes.ts": "885f61f343223f27b8ec69cc138a54bea30542924eacd0f290cd84edcf691387",
     "https://deno.land/x/cliffy@v0.25.7/ansi/chain.ts": "31fb9fcbf72fed9f3eb9b9487270d2042ccd46a612d07dd5271b1a80ae2140a0",
