@@ -1,3 +1,5 @@
+import { existsSync } from "https://deno.land/std/fs/mod.ts";
+
 /**
  * Starts the ripping process for a given title using MakeMKV.
  *
@@ -39,6 +41,11 @@ export async function ripTitle(
 	const { title, driveId, titleId, audioTracks, subtitleTracks, outputDir } =
 		options;
 
+	//Check if Output dir exists, if not, create it
+	if (!existsSync(outputDir)) {
+		await Deno.mkdir(outputDir);
+	}
+
 	// MakeMKV expects something like:
 	// makemkvcon mkv disc:0 <titleId> "outputDir" --minlength=120 --audio=... --subtitle=...
 	// If you have a single optical drive and it’s the only BD in the system, it’s often disc:0.
@@ -46,26 +53,22 @@ export async function ripTitle(
 	// According to the docs, if you use file:"G:", MakeMKV treats it as disc input from that drive.
 
 	// Construct audio and subtitle arguments. If empty, we omit them to select all.
-	const audioArg =
-		audioTracks.length > 0 ? `--audio=${audioTracks.join(",")}` : "";
-	const subtitleArg =
-		subtitleTracks.length > 0
-			? `--subtitle=${subtitleTracks.join(",")}`
-			: "";
+	const audioArg: any = []; //audioTracks.length > 0 ? `--audio=${audioTracks.join(",")}` : "";
+	const subtitleArg: any = []; //subtitleTracks.length > 0 ? `--subtitle=${subtitleTracks.join(",")}` : "";
 
 	const args = [
+		"--progress=-same",
+		"--noscan",
+		"-r",
 		"mkv",
 		`disc:${driveId.toString()}`, // Source from the specified drive
 		titleId.toString(), // Title ID
-		`"${outputDir}"`, // Output directory
+		outputDir, // Output directory
 	];
 
 	// Add optional arguments if they have values
-	if (audioArg) args.push(audioArg);
-	if (subtitleArg) args.push(subtitleArg);
-
-	console.log(`Starting to rip ${title}`);
-	console.log(`Command: ${config.dependencies.makemkv} ${args.join(" ")}`);
+	if (audioArg.length !== 0) args.push(audioArg);
+	if (subtitleArg.length !== 0) args.push(subtitleArg);
 
 	const process = new Deno.Command(config.dependencies.makemkv, {
 		args,
@@ -102,21 +105,47 @@ export async function ripTitle(
 		}
 	}
 
+	let state = 0;
+	let currentStateString = "";
 	function handleLine(line: string, isStdErr: boolean) {
 		if (!line) return;
 		// For now, just print lines to console. You can parse MSG lines for progress.
 		// MSG lines might look like: MSG:5010,0,0,"Copying title 1...","Copying title 1..."
 		// You could parse these further and extract actual progress if needed.
+		const enc = (s: string) => new TextEncoder().encode(s);
 
 		if (line.startsWith("MSG:")) {
-			// Simple progress info: Just log it
-			console.log(`[MakeMKV - MSG]: ${line}`);
+			return;
+		} else if (line.startsWith("PRGC:")) {
+			state++;
+			const stateMsg = line.split(":")[1].split(",")[2].split('"')[1];
+			currentStateString = `[${state}/7] - __% / ___% - ${stateMsg}\r`;
+		} else if (line.startsWith("PRGV:")) {
+			const [current, total, max] = line.split(":")[1].split(",");
+
+			const percentage1 = (
+				(parseInt(current) / parseInt(max)) *
+				100
+			).toFixed(2);
+
+			const percentage2 = (
+				(parseInt(total) / parseInt(max)) *
+				100
+			).toFixed(2);
+
+			Deno.stdout.write(
+				enc(
+					currentStateString
+						.replace("__", percentage1)
+						.replace("___", percentage2)
+				)
+			);
 		} else {
 			// General output
 			if (isStdErr) {
 				console.error(`[MakeMKV - ERR]: ${line}`);
 			} else {
-				console.log(`[MakeMKV]: ${line}`);
+				return;
 			}
 		}
 	}
