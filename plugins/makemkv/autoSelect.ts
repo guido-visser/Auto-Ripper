@@ -1,14 +1,15 @@
-import { Config } from "../types.ts";
+import { Config } from "../../types.ts";
 import { ParseResult } from "./parser.ts";
 
 export const autoSelect = (
-	titles: ParseResult["titlesByMkv"],
-	config: Config
+	config: Config,
+	titles: ParseResult["titlesByMkv"]
 ) => {
 	const audioResult: number[] = [];
 	const subtitleResult: number[] = [];
 	let videoResult: number;
 	let largestTitle: number = 0;
+	let name: string;
 
 	Object.keys(titles).forEach((title) => {
 		const currentTitle = titles[title];
@@ -85,6 +86,7 @@ export const autoSelect = (
 		if (number > largestTitle) {
 			videoResult = currentTitle.titleId;
 			largestTitle = number;
+			name = currentTitle.mkvName;
 		}
 	});
 
@@ -92,5 +94,6 @@ export const autoSelect = (
 		audio: audioResult,
 		subtitles: subtitleResult,
 		video: videoResult,
+		name,
 	};
 };

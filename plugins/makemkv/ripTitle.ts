@@ -22,7 +22,7 @@ import { existsSync } from "https://deno.land/std/fs/mod.ts";
  * may contain progress info. You can parse them or just print them directly.
  */
 
-import { Config } from "../types.ts";
+import { PluginRef } from "../../types.ts";
 
 interface RippingOptions {
 	title: string;
@@ -35,7 +35,7 @@ interface RippingOptions {
 }
 
 export async function ripTitle(
-	config: Config,
+	ref: PluginRef,
 	options: RippingOptions
 ): Promise<void> {
 	const { title, driveId, titleId, audioTracks, subtitleTracks, outputDir } =
@@ -70,7 +70,7 @@ export async function ripTitle(
 	if (audioArg.length !== 0) args.push(audioArg);
 	if (subtitleArg.length !== 0) args.push(subtitleArg);
 
-	const process = new Deno.Command(config.dependencies.makemkv, {
+	const process = new Deno.Command(ref.path, {
 		args,
 		stdout: "piped",
 		stderr: "piped",
@@ -91,7 +91,7 @@ export async function ripTitle(
 			const { value, done } = await reader.read();
 			if (done) break;
 			buffer += decoder.decode(value, { stream: true });
-			let lines = buffer.split("\n");
+			const lines = buffer.split("\n");
 			// Save the last partial line for next iteration
 			buffer = lines.pop() || "";
 
