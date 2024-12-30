@@ -93,7 +93,7 @@ interface TrackInfo {
 /**
  * A structured representation of a title extracted from TINFO and SINFO entries.
  */
-interface TitleInfo {
+export interface TitleInfo {
 	titleId: number;
 	mkvName?: string;
 	chapterCount?: number;

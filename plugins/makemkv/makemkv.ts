@@ -7,7 +7,6 @@ import { Select } from "https://deno.land/x/cliffy@v0.25.7/prompt/select.ts";
 import * as path from "node:path";
 
 export default class MakeMKV {
-	name: string = "makemkv";
 	config: Config;
 
 	constructor(config: Config, _prevPluginOutput: PluginOutput) {
@@ -15,6 +14,7 @@ export default class MakeMKV {
 	}
 
 	init = async (ref: PluginRef) => {
+		console.log("[MakeMKV] Plugin Initialized");
 		console.log("Scanning drives...");
 		const driveInfo = await scanDrives(ref);
 		const driveLetters: { [driveId: string]: string } = {};
@@ -42,29 +42,39 @@ export default class MakeMKV {
 
 		const selected = autoSelect(this.config, discInfo.titlesByMkv);
 
-		const pluginOut: PluginOutput = {
+		const pluginOut = {
 			title,
 			titleId: selected.video,
 			driveId: selectedDrive,
 			driveLetter: driveLetters[driveNumber],
 			audioTracks: selected.audio,
 			subtitleTracks: selected.subtitles,
-			outputDir: path.join(this.config.defaults.outputDir, title),
+			outputDir: path.join(this.config.defaults.outputDir, title, "tmp"),
 		};
 
 		await ripTitle(ref, pluginOut);
+		console.log("");
 
 		const oldPath = path.join(
 			this.config.defaults.outputDir,
+			title,
+			"tmp",
 			selected.name
 		);
 		const newPath = path.join(
 			this.config.defaults.outputDir,
+			title,
+			"tmp",
 			`${title}.mkv`
 		);
 
 		await Deno.rename(oldPath, newPath);
 
-		return pluginOut;
+		return {
+			title,
+			fullPath: newPath,
+			fileName: `${title}.mkv`,
+			outputDir: path.join(this.config.defaults.outputDir, title),
+		};
 	};
 }

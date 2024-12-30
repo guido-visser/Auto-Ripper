@@ -23,6 +23,7 @@ import { existsSync } from "https://deno.land/std/fs/mod.ts";
  */
 
 import { PluginRef } from "../../types.ts";
+import { execProgress } from "../../execCommand.ts";
 
 interface RippingOptions {
 	title: string;
@@ -38,23 +39,12 @@ export async function ripTitle(
 	ref: PluginRef,
 	options: RippingOptions
 ): Promise<void> {
-	const { title, driveId, titleId, audioTracks, subtitleTracks, outputDir } =
-		options;
+	const { driveId, titleId, outputDir } = options;
 
 	//Check if Output dir exists, if not, create it
 	if (!existsSync(outputDir)) {
-		await Deno.mkdir(outputDir);
+		await Deno.mkdir(outputDir, { recursive: true });
 	}
-
-	// MakeMKV expects something like:
-	// makemkvcon mkv disc:0 <titleId> "outputDir" --minlength=120 --audio=... --subtitle=...
-	// If you have a single optical drive and it’s the only BD in the system, it’s often disc:0.
-	// But we can also specify the drive letter: file:"G:"
-	// According to the docs, if you use file:"G:", MakeMKV treats it as disc input from that drive.
-
-	// Construct audio and subtitle arguments. If empty, we omit them to select all.
-	const audioArg: any = []; //audioTracks.length > 0 ? `--audio=${audioTracks.join(",")}` : "";
-	const subtitleArg: any = []; //subtitleTracks.length > 0 ? `--subtitle=${subtitleTracks.join(",")}` : "";
 
 	const args = [
 		"--progress=-same",
@@ -66,60 +56,15 @@ export async function ripTitle(
 		outputDir, // Output directory
 	];
 
-	// Add optional arguments if they have values
-	if (audioArg.length !== 0) args.push(audioArg);
-	if (subtitleArg.length !== 0) args.push(subtitleArg);
-
-	const process = new Deno.Command(ref.path, {
-		args,
-		stdout: "piped",
-		stderr: "piped",
-	}).spawn();
-
-	// Use a reader to handle output line-by-line
-	const stdoutReader = process.stdout.getReader();
-	const stderrReader = process.stderr.getReader();
-
-	// Function to handle output lines
-	async function readStream(
-		reader: ReadableStreamDefaultReader<Uint8Array>,
-		isStdErr = false
-	) {
-		const decoder = new TextDecoder();
-		let buffer = "";
-		for (;;) {
-			const { value, done } = await reader.read();
-			if (done) break;
-			buffer += decoder.decode(value, { stream: true });
-			const lines = buffer.split("\n");
-			// Save the last partial line for next iteration
-			buffer = lines.pop() || "";
-
-			for (const line of lines) {
-				handleLine(line.trim(), isStdErr);
-			}
-		}
-		// Flush remaining buffer
-		if (buffer) {
-			handleLine(buffer.trim(), isStdErr);
-		}
-	}
-
 	let state = 0;
 	let currentStateString = "";
-	function handleLine(line: string, isStdErr: boolean) {
-		if (!line) return;
-		// For now, just print lines to console. You can parse MSG lines for progress.
-		// MSG lines might look like: MSG:5010,0,0,"Copying title 1...","Copying title 1..."
-		// You could parse these further and extract actual progress if needed.
-		const enc = (s: string) => new TextEncoder().encode(s);
-
+	await execProgress(ref.path, args, (line: string, log) => {
 		if (line.startsWith("MSG:")) {
 			return;
 		} else if (line.startsWith("PRGC:")) {
 			state++;
 			const stateMsg = line.split(":")[1].split(",")[2].split('"')[1];
-			currentStateString = `[${state}/7] - __% / ___% - ${stateMsg}\r`;
+			currentStateString = `[MakeMKV] [${state}/7] - __% / ___% - ${stateMsg}\r`;
 		} else if (line.startsWith("PRGV:")) {
 			const [current, total, max] = line.split(":")[1].split(",");
 
@@ -133,46 +78,11 @@ export async function ripTitle(
 				100
 			).toFixed(2);
 
-			Deno.stdout.write(
-				enc(
-					currentStateString
-						.replace("__", percentage1)
-						.replace("___", percentage2)
-				)
+			log(
+				currentStateString
+					.replace("__", percentage1)
+					.replace("___", percentage2)
 			);
-		} else {
-			// General output
-			if (isStdErr) {
-				console.error(`[MakeMKV - ERR]: ${line}`);
-			} else {
-				return;
-			}
 		}
-	}
-
-	// Run in parallel
-	const [status] = await Promise.all([
-		process.status,
-		readStream(stdoutReader),
-		readStream(stderrReader, true),
-	]);
-
-	if (status.success) {
-		console.log(`Ripping completed successfully for title ${titleId}.`);
-	} else {
-		console.error(
-			`Ripping failed for title ${titleId} with code ${status.code}.`
-		);
-		throw new Error(`MakeMKV rip failed with code ${status.code}`);
-	}
+	});
 }
-
-// Example usage:
-// await ripTitle({
-//   makemkvPath: 'C:\\Program Files (x86)\\MakeMKV\\makemkvcon64.exe',
-//   driveLetter: 'G:',
-//   titleId: 1,
-//   audioTracks: [2,3],
-//   subtitleTracks: [10],
-//   outputDir: 'M:\\Video\\Automated'
-// });
