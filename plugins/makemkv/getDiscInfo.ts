@@ -12,6 +12,7 @@ export async function getDiscInfo(
 		"info",
 		`disc:${driveIndex}`,
 		"--directio=true",
+		"--noscan",
 	]);
 	return parseMakemkvOutput(output);
 }

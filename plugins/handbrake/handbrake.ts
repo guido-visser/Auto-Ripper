@@ -58,5 +58,12 @@ export default class Handbrake {
 		const pathToDelete = path.join(this.prev.outputDir, "tmp");
 
 		await Deno.remove(pathToDelete, { recursive: true });
+
+		return {
+			title: this.prev.title,
+			outputDir: this.prev.outputDir,
+			fullPath: path.join(this.prev.outputDir, `${this.prev.title}.mkv`),
+			fileName: `${this.prev.title}.mkv`,
+		};
 	};
 }

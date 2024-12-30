@@ -75,6 +75,9 @@ export const autoSelect = (
 		console.log(
 			"No audiotrack found that matches your default languages. Picking the best match based upon audio codec and name"
 		);
+		if (!audioResult[currentTitle.mkvName]) {
+			audioResult[currentTitle.mkvName] = [];
+		}
 		audioResult[currentTitle.mkvName].push(-1);
 	}
 

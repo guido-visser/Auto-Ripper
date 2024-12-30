@@ -2,6 +2,7 @@ import { parseArgs } from "https://deno.land/std/cli/parse_args.ts";
 import { Config, PluginOutput } from "./types.ts";
 import MakeMKV from "./plugins/makemkv/makemkv.ts";
 import Handbrake from "./plugins/handbrake/handbrake.ts";
+import Copy from "./plugins/copy/copy.ts";
 import { help } from "./modules/help.ts";
 import { exists } from "https://deno.land/std/fs/mod.ts";
 import generateConfig from "./modules/generateConfig.ts";
@@ -9,6 +10,7 @@ import generateConfig from "./modules/generateConfig.ts";
 const plugins: { [key: string]: any } = {
 	makemkv: MakeMKV,
 	handbrake: Handbrake,
+	copy: Copy,
 };
 
 if (!(await exists("./config.json"))) {
