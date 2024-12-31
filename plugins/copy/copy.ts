@@ -135,6 +135,6 @@ export default class Copy {
 		}
 
 		// Final newline after progress
-		console.log("\nCopy completed!");
+		console.log("\n[Copy] File(s) transferred");
 	};
 }
