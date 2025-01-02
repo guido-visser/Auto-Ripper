@@ -69,7 +69,6 @@ export default class Handbrake {
 		const pathToDelete = path.join(this.prev.outputDir, "tmp");
 
 		await Deno.remove(pathToDelete, { recursive: true });
-		console.log("");
 
 		return {
 			title: this.prev.title,

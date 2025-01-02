@@ -85,5 +85,4 @@ export async function ripTitle(
 			);
 		}
 	});
-	console.log("");
 }

@@ -4,7 +4,8 @@
 	},
 	"tasks": {
 		"dev": "deno run --watch main.ts",
-		"build": "deno compile --allow-read --allow-write --allow-env --allow-run --allow-net main.ts -o ./bin/"
+		"build": "deno compile --allow-read --allow-write --allow-env --allow-run --allow-net main.ts -o ./bin/",
+		"build:all": "deno compile --allow-all main.ts -o ./bin/auto-ripper-all.exe"
 	},
 	"imports": {
 		"@std/assert": "jsr:@std/assert@1",

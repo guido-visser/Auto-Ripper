@@ -17,6 +17,8 @@ export default class Copy {
 			this.prev.outputDir,
 			join(ref.path, this.prev.title)
 		);
+		console.log(`[Copy] Removing old files`);
+		await Deno.remove(this.prev.outputDir, { recursive: true });
 	};
 
 	/**

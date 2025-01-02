@@ -81,5 +81,6 @@ export async function execProgress(
 		readStream(stderrReader, true),
 	]);
 
+	console.log("");
 	return status;
 }
