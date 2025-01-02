@@ -22,12 +22,12 @@ export const autoSelect = (config: Config, fileInfo: HandBrakeOutput) => {
 				const codecScore = config.defaults.audioCodec.indexOf(
 					track.CodecName || ""
 				);
-				const finalCodecScore = codecScore === -1 ? 9999 : codecScore;
+				const finalCodecScore = codecScore === -1 ? 0 : codecScore;
 
 				const nameScore = config.defaults.audioName.indexOf(
 					track.Name || ""
 				);
-				const finalNameScore = nameScore === -1 ? 9999 : nameScore;
+				const finalNameScore = nameScore === -1 ? 0 : nameScore;
 
 				const trackScore = finalCodecScore * 1000 + finalNameScore;
 				return { track, trackScore };
@@ -35,7 +35,7 @@ export const autoSelect = (config: Config, fileInfo: HandBrakeOutput) => {
 		);
 
 		// Sort by trackScore ascending, pick the best one
-		scoredTracks.sort((a, b) => a.trackScore - b.trackScore);
+		scoredTracks.sort((a, b) => (a.trackScore < b.trackScore ? 1 : 0));
 
 		if (lang && !addedLanguages.includes(lang)) {
 			audioResult.push(scoredTracks[0].track.TrackNumber);

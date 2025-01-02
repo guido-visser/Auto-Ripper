@@ -25,15 +25,26 @@ export default class Handbrake {
 		const fileInfo = JSON.parse(output.split("JSON Title Set: ")[1].trim());
 		const selected = autoSelect(this.config, fileInfo);
 
+		const audioTracks = selected.audio.join(",");
+		let subtitleTracks = selected.subtitles.join(",");
+		const outputPath = path.join(
+			this.prev.outputDir,
+			`${this.prev.title}.mkv`
+		);
+
+		if (!this.config.defaults.includeSubs) {
+			subtitleTracks = "none";
+		}
+
 		const args: string[] = [
 			"-i",
 			`${this.prev.fullPath}`,
-			"-a",
-			selected.audio.join(","),
+			"--audio-lang-list",
+			this.config.defaults.audioLanguages.join(","),
 			"-s",
-			selected.subtitles.join(","),
+			subtitleTracks,
 			"-o",
-			`${path.join(this.prev.outputDir, `${this.prev.title}.mkv`)}`,
+			outputPath,
 			"--json",
 		];
 
@@ -42,7 +53,7 @@ export default class Handbrake {
 			const presetName = preset.PresetList[0].PresetName;
 			args.push("--preset-import-file");
 			args.push(`${ref.options.preset}`);
-			args.push("-Z");
+			args.push("--preset");
 			args.push(`${presetName}`);
 		}
 
@@ -58,6 +69,7 @@ export default class Handbrake {
 		const pathToDelete = path.join(this.prev.outputDir, "tmp");
 
 		await Deno.remove(pathToDelete, { recursive: true });
+		console.log("");
 
 		return {
 			title: this.prev.title,
