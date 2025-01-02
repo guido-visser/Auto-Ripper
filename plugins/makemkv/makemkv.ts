@@ -53,7 +53,6 @@ export default class MakeMKV {
 		};
 
 		await ripTitle(ref, pluginOut);
-		console.log("");
 
 		const oldPath = path.join(
 			this.config.defaults.outputDir,

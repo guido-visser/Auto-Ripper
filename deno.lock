@@ -7,6 +7,7 @@
     "npm:inquirer@*": "12.2.0_@types+node@22.9.0",
     "npm:jsonfile@*": "6.1.0",
     "npm:jsonfile@^6.1.0": "6.1.0",
+    "npm:node-mediainfo@^1.0.3": "1.0.3",
     "npm:opensubtitles-api@^5.1.2": "5.1.2"
   },
   "jsr": {
@@ -239,6 +240,9 @@
     },
     "mute-stream@2.0.0": {
       "integrity": "sha512-WWdIxpyjEn+FhQJQQv9aQAYlHoNVdzIzUySNV1gHUPDSdZJ3yZn7pAAbQcV7B56Mvu881q9FZV+0Vx2xC44VWA=="
+    },
+    "node-mediainfo@1.0.3": {
+      "integrity": "sha512-FGwQYvLMW+XOnw7r4MnVq9FGO5YJjlQOB971wEx3z+GBWhZF783mHrRz/RUloB0+agEfsRUk/mQqrn/JeDH0PQ=="
     },
     "opensubtitles-api@5.1.2": {
       "integrity": "sha512-uGc9+/hbi1VkYGwNS0yBEeN9+URQvfZUcX3JtFBYWkwU/cUUVGbgLiI4Sx3SmumKtNoXjYDhJ9SoFTT0jVNOUQ==",
@@ -516,6 +520,7 @@
     "dependencies": [
       "jsr:@std/assert@1",
       "npm:jsonfile@^6.1.0",
+      "npm:node-mediainfo@^1.0.3",
       "npm:opensubtitles-api@^5.1.2"
     ]
   }

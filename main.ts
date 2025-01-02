@@ -6,11 +6,13 @@ import Copy from "./plugins/copy/copy.ts";
 import { help } from "./modules/help.ts";
 import { exists } from "https://deno.land/std/fs/mod.ts";
 import generateConfig from "./modules/generateConfig.ts";
+import OpenSubtitles from "./plugins/opensubtitles/opensubtitles.ts";
 
 const plugins: { [key: string]: any } = {
 	makemkv: MakeMKV,
 	handbrake: Handbrake,
 	copy: Copy,
+	opensubtitles: OpenSubtitles,
 };
 
 if (!(await exists("./config.json"))) {
@@ -42,6 +44,23 @@ async function main() {
 	}
 
 	let prevPluginOutput: PluginOutput;
+
+	//Check if all configured paths exist
+	for (let i = 0; i < config.plugins.length; i++) {
+		const pluginRef = config.plugins[i];
+		if (!pluginRef.enabled) continue;
+		if (!pluginRef.path) continue;
+
+		const result = await exists(pluginRef.path);
+		if (!result) {
+			console.error(
+				"Path for plugin",
+				pluginRef.name,
+				"does not exist. Please check configuration. Auto Ripper will exit now."
+			);
+			Deno.exit(1);
+		}
+	}
 	for (let i = 0; i < config.plugins.length; i++) {
 		const pluginRef = config.plugins[i];
 		if (!plugins[pluginRef.name]) {

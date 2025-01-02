@@ -9,6 +9,7 @@
 	"imports": {
 		"@std/assert": "jsr:@std/assert@1",
 		"jsonfile": "npm:jsonfile@^6.1.0",
+		"node-mediainfo": "npm:node-mediainfo@^1.0.3",
 		"opensubtitles-api": "npm:opensubtitles-api@^5.1.2"
 	}
 }
