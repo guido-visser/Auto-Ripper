@@ -3,18 +3,22 @@ import { Config, PluginOutput, PluginRef } from "../../types.ts";
 import { autoSelect } from "./autoSelect.ts";
 import * as path from "node:path";
 import jsonfile from "jsonfile";
+import { Queue } from "./queue.ts";
 
 export default class Handbrake {
 	config: Config;
 	prev: PluginOutput;
+	queue: Queue;
 
 	constructor(config: Config, prevPluginOutput: PluginOutput) {
 		this.config = config;
 		this.prev = prevPluginOutput;
+		this.queue = new Queue();
 	}
 
 	init = async (ref: PluginRef) => {
 		console.log("[HandBrake] Plugin Initialized");
+
 		const output = await execCommand([
 			ref.path,
 			"-i",
@@ -57,6 +61,10 @@ export default class Handbrake {
 			args.push(`${presetName}`);
 		}
 
+		// --- Queue logic ---
+		await this.queue.join();
+		await this.queue.waitTurn();
+
 		await execProgress(ref.path, args, (line: string, log) => {
 			if (!line.startsWith('"Progress": ')) return;
 
@@ -68,7 +76,12 @@ export default class Handbrake {
 
 		const pathToDelete = path.join(this.prev.outputDir, "tmp");
 
-		await Deno.remove(pathToDelete, { recursive: true });
+		if (!ref.options.keepRemux) {
+			await Deno.remove(pathToDelete, { recursive: true });
+		}
+
+		// --- Remove self from queue ---
+		await this.queue.leave();
 
 		return {
 			title: this.prev.title,

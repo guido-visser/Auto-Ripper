@@ -1,22 +1,24 @@
 import { parseArgs } from "https://deno.land/std/cli/parse_args.ts";
 import { Config, PluginOutput } from "./types.ts";
 import MakeMKV from "./plugins/makemkv/makemkv.ts";
-import Handbrake from "./plugins/handbrake/handbrake.ts";
+import HandBrake from "./plugins/handbrake/handbrake.ts";
 import Copy from "./plugins/copy/copy.ts";
 import { help } from "./modules/help.ts";
 import { exists } from "https://deno.land/std/fs/mod.ts";
 import generateConfig from "./modules/generateConfig.ts";
 import OpenSubtitles from "./plugins/opensubtitles/opensubtitles.ts";
+import { Setup } from "./modules/setup.ts";
 
 const plugins: { [key: string]: any } = {
-	makemkv: MakeMKV,
-	handbrake: Handbrake,
-	copy: Copy,
-	opensubtitles: OpenSubtitles,
+	MakeMKV,
+	HandBrake,
+	Copy,
+	OpenSubtitles,
 };
 
 if (!(await exists("./config.json"))) {
-	await generateConfig();
+	//await generateConfig();
+	await Setup();
 }
 
 const configText = await Deno.readTextFile("./config.json");
@@ -44,6 +46,13 @@ async function main() {
 	}
 
 	let prevPluginOutput: PluginOutput;
+	const title = "Rush (2013)";
+	prevPluginOutput = {
+		title,
+		fileName: `${title}.mkv`,
+		fullPath: `M:\\Video\\Automated\\${title}\\tmp\\${title}.mkv`,
+		outputDir: `M:\\Video\\Automated\\${title}`,
+	};
 
 	//Check if all configured paths exist
 	for (let i = 0; i < config.plugins.length; i++) {

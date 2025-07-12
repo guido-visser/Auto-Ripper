@@ -181,3 +181,11 @@ interface HBTimeDuration {
 interface HBProgress {
 	state: string;
 }
+
+export type Software = {
+	DisplayName: string;
+	DisplayVersion: string;
+	InstallDate: string;
+	InstallLocation: string;
+	Publisher: string;
+};
